@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retail Inventory DSS</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Retail Inventory DSS</h1>
+    <span id="conn" class="conn">Connecting…</span>
+  </header>
+
+  <main>
+    <p id="global-error" class="error" hidden></p>
+
+    <!-- Headline numbers -->
+    <section class="kpis" aria-label="Key figures">
+      <div class="kpi"><span class="kpi-label">Products</span><span id="kpi-products" class="kpi-value">–</span></div>
+      <div class="kpi"><span class="kpi-label">Units in stock</span><span id="kpi-units" class="kpi-value">–</span></div>
+      <div class="kpi"><span class="kpi-label">Inventory value</span><span id="kpi-value" class="kpi-value">–</span></div>
+      <div class="kpi"><span class="kpi-label">Out of stock</span><span id="kpi-out" class="kpi-value">–</span></div>
+      <div class="kpi"><span class="kpi-label" id="kpi-sold-label">Units sold</span><span id="kpi-sold" class="kpi-value">–</span></div>
+    </section>
+
+    <div class="grid">
+      <!-- Stock chart -->
+      <section class="card">
+        <h2>Stock by product <span class="muted">(lowest first)</span></h2>
+        <div id="chart-box" class="chart-box"><canvas id="stock-chart" aria-label="Current stock per product" role="img"></canvas></div>
+      </section>
+
+      <!-- Record a transaction -->
+      <section class="card">
+        <h2>Record stock movement</h2>
+        <form id="txn-form" class="form">
+          <label>Product <select name="product_id" required></select></label>
+          <label>Type <select name="txn_type" required></select></label>
+          <label id="direction-field" hidden>Direction
+            <select name="direction">
+              <option value="1">Increase stock</option>
+              <option value="-1">Decrease stock</option>
+            </select>
+          </label>
+          <label>Quantity <input name="qty" type="number" min="1" step="1" required></label>
+          <button type="submit">Record</button>
+          <p class="error" data-role="error" hidden></p>
+          <p class="success" data-role="success" hidden></p>
+        </form>
+      </section>
+    </div>
+
+    <!-- Products -->
+    <section class="card">
+      <h2>Products</h2>
+      <p class="error" id="products-error" hidden></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Product</th><th>Supplier</th><th class="num">Lead time (days)</th><th class="num">Unit price</th><th class="num">Stock</th><th></th></tr></thead>
+          <tbody id="products-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Transaction history -->
+    <section class="card">
+      <h2>Recent transactions</h2>
+      <label class="inline">Filter by product <select id="history-filter"><option value="">All products</option></select></label>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>When</th><th>Product</th><th>Type</th><th class="num">Qty</th></tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- Product form (add / edit) -->
+      <section class="card">
+        <h2 id="product-form-title">Add product</h2>
+        <form id="product-form" class="form">
+          <input type="hidden" name="edit_id">
+          <label>Name <input name="name" required maxlength="200"></label>
+          <label>Supplier <select name="supplier_id" required></select></label>
+          <label>Unit price (₹) <input name="unit_price" type="number" min="0" step="0.01" required></label>
+          <div class="actions">
+            <button type="submit">Save product</button>
+            <button type="button" class="secondary" data-role="cancel" hidden>Cancel edit</button>
+          </div>
+          <p class="error" data-role="error" hidden></p>
+        </form>
+      </section>
+
+      <!-- Suppliers: form + list -->
+      <section class="card">
+        <h2 id="supplier-form-title">Add supplier</h2>
+        <form id="supplier-form" class="form">
+          <input type="hidden" name="edit_id">
+          <label>Name <input name="name" required maxlength="200"></label>
+          <label>Phone <input name="phone" placeholder="optional"></label>
+          <label>Lead time (days) <input name="lead_time_days" type="number" min="0" max="365" step="1" required></label>
+          <div class="actions">
+            <button type="submit">Save supplier</button>
+            <button type="button" class="secondary" data-role="cancel" hidden>Cancel edit</button>
+          </div>
+          <p class="error" data-role="error" hidden></p>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Supplier</th><th>Phone</th><th class="num">Lead time</th><th></th></tr></thead>
+            <tbody id="suppliers-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

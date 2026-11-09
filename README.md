@@ -11,17 +11,26 @@ A simple retail inventory management API built with FastAPI.
 ## Setup
 
 ```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Then open http://127.0.0.1:8000/docs for the interactive API docs.
+Then open:
+
+- http://localhost:8000 – the DSS dashboard (served from `frontend/`)
+- http://localhost:8000/docs – interactive API docs
+
+`inventory.db` is created and seeded with demo data on first startup. Delete it to reset.
+The dashboard loads Chart.js from a CDN, so the chart needs internet access; everything else works offline.
 
 ## Tech Stack
 
 - Python
 - FastAPI
 - Uvicorn
+- Frontend: plain HTML/CSS/JS + Chart.js (no build step)
 
 ## Database schema
 

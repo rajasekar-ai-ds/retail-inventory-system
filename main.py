@@ -1,8 +1,11 @@
+import pathlib
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Path, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -192,3 +195,18 @@ def list_transactions(
         stmt = stmt.where(StockTransaction.product_id == product_id)
     stmt = stmt.order_by(StockTransaction.txn_date.desc(), StockTransaction.txn_id.desc()).limit(limit)
     return db.scalars(stmt).all()
+
+
+# ---------- Frontend ----------
+
+# Resolved from this file, not the working directory, so `uvicorn main:app` works from anywhere.
+FRONTEND_DIR = pathlib.Path(__file__).resolve().parent / "frontend"
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/app/")
+
+
+# Mounted last and under /app so it can never shadow an API route.
+app.mount("/app", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
