@@ -135,38 +135,36 @@ correct mistakes by posting an `adjustment`.
 { "detail": "Insufficient stock for product 1: current stock is 42, change of -100 would make it -58." }
 ```
 
-## SCHEMAS for JSON
-[
-  {
-    "product_id": 1,
-    "name": "Atta 5kg",
-    "current_stock": 40,
-    "avg_daily_demand": 8.0,
-    "lead_time_days": 3,
-    "safety_stock": 18,
-    "reorder_point": 42,
-    "status": "REORDER"
-  }
-]
+### Decision support (`/dss`)
 
-[
-  {
-    "product_id": 1,
-    "name": "Atta 5kg",
-    "current_stock": 40,
-    "avg_daily_demand": 5.3,
-    "days_of_cover_avg": 7.5,
-    "days_of_cover_worst": 2.9,
-    "status": "OK"
-  },
-  {
-    "product_id": 7,
-    "name": "Rose Biscuits",
-    "current_stock": 60,
-    "avg_daily_demand": 0,
-    "days_of_cover_avg": null,
-    "days_of_cover_worst": null,
-    "status": "NO_SALES"
-  }
-]
+| Method | Path | Success | Errors |
+|---|---|---|---|
+| GET | `/dss/alerts` | 200 `[Alert]`, ordered CRITICAL, REORDER, NO_SALES, OK; then `days_of_cover` ASC | |
+| GET | `/dss/alerts/{product_id}` | 200 `Alert` | 404, 422 |
+| GET | `/dss/summary` | 200 `Summary` | |
+
+Rules (constants `WINDOW_DAYS = 7`, `REVIEW_DAYS = 7` in `dss.py`):
+
+- Demand counts `sale` rows only, over the last 7 UTC calendar days (today included).
+- `d` = units sold / 7; `max_daily_demand` = biggest single-day total (no-sale days count as 0).
+- `safety_stock = (max_daily − d) × lead_time`; `reorder_point = d × lead_time + safety_stock`.
+- Status, first match wins: `d = 0` → NO_SALES; `stock / d < lead_time` → CRITICAL;
+  `stock ≤ reorder_point` → REORDER; else OK.
+- `recommended_order_qty = max(0, ceil(d × (lead_time + 7) + safety_stock − stock))`; 0 for NO_SALES and OK.
+- Decimals are rounded to 2 places in the response; status and order qty use exact values.
+
+```json
+// Alert
+{
+  "product_id": 1, "name": "Atta 5kg", "stock": 3, "lead_time_days": 5,
+  "avg_daily_demand": 2.0, "max_daily_demand": 2, "days_of_cover": 1.5,
+  "safety_stock": 0.0, "reorder_point": 10.0, "status": "CRITICAL",
+  "recommended_order_qty": 21,
+  "reason": "Stock 3 lasts ~1.5 days; supplier needs 5 days -> order now."
+}
+// days_of_cover is null when status is NO_SALES
+
+// Summary
+{ "CRITICAL": 1, "REORDER": 2, "NO_SALES": 0, "OK": 5 }
+```
 

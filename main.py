@@ -10,6 +10,7 @@ from sqlalchemy import exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+import dss
 from database import DB_PATH, Base, SessionLocal, engine, get_db
 from models import Product, StockTransaction, Supplier
 from schemas import (
@@ -50,6 +51,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(dss.router)
 
 
 # Bounded like schemas.Id so an oversized id in the URL is a 422, not a driver crash.

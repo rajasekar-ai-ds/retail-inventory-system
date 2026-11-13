@@ -91,3 +91,28 @@ class TransactionOut(BaseModel):
 
 class TransactionResult(TransactionOut):
     current_stock: int
+
+
+DssStatus = Literal["CRITICAL", "REORDER", "NO_SALES", "OK"]
+
+
+class DssAlert(BaseModel):
+    product_id: int
+    name: str
+    stock: int
+    lead_time_days: int
+    avg_daily_demand: float
+    max_daily_demand: int
+    days_of_cover: float | None  # None when there were no sales
+    safety_stock: float
+    reorder_point: float
+    status: DssStatus
+    recommended_order_qty: int
+    reason: str
+
+
+class DssSummary(BaseModel):
+    CRITICAL: int
+    REORDER: int
+    NO_SALES: int
+    OK: int
