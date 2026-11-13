@@ -15,6 +15,12 @@
   --success: #0f6b3a;
   --critical: #c62828;
   --critical-bg: #fdecea;
+  --reorder: #9a5800;
+  --reorder-bg: #fff1dc;
+  --ok: #0f6b3a;
+  --ok-bg: #e4f3e9;
+  --nosales: #5f5e5a;
+  --nosales-bg: #ecebe7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +40,12 @@
     --success: #6fcf97;
     --critical: #ff8a80;
     --critical-bg: #3a1d1b;
+    --reorder: #ffb74d;
+    --reorder-bg: #3a2c14;
+    --ok: #6fcf97;
+    --ok-bg: #16301f;
+    --nosales: #b5b4ad;
+    --nosales-bg: #2a2a28;
   }
 }
 :root[data-theme="dark"] {
@@ -52,9 +64,17 @@
   --success: #6fcf97;
   --critical: #ff8a80;
   --critical-bg: #3a1d1b;
+  --reorder: #ffb74d;
+  --reorder-bg: #3a2c14;
+  --ok: #6fcf97;
+  --ok-bg: #16301f;
+  --nosales: #b5b4ad;
+  --nosales-bg: #2a2a28;
 }
 
 * { box-sizing: border-box; }
+/* Author `display` rules (e.g. `.form label { display: flex }`) would otherwise override the hidden attribute. */
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -130,6 +150,16 @@ td.actions-cell { text-align: right; }
 
 .badge { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .badge.critical { color: var(--critical); background: var(--critical-bg); }
+.badge.reorder { color: var(--reorder); background: var(--reorder-bg); }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.nosales { color: var(--nosales); background: var(--nosales-bg); }
+td .badge { margin-left: 0; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.chip .badge { margin-left: 0; }
+/* The reason sentence wraps instead of stretching the table. */
+td.reason { white-space: normal; min-width: 260px; color: var(--text-2); }
 
 @media (max-width: 600px) {
   .topbar, main { padding-left: 16px; padding-right: 16px; }

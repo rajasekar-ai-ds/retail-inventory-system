@@ -9,5 +9,14 @@ const TXN_TYPES = {
   adjustment: { label: "Adjustment", sign: null }, // user picks the direction
 };
 
+// DSS status codes (from /dss/*) -> display label + badge class. Compare codes, never labels.
+// Key order is the display order of the summary chips (matches the backend's sort order).
+const DSS_STATUS = {
+  CRITICAL: { label: "Critical", cls: "critical" },
+  REORDER: { label: "Reorder", cls: "reorder" },
+  NO_SALES: { label: "No sales", cls: "nosales" },
+  OK: { label: "OK", cls: "ok" },
+};
+
 // How far back the "units sold" KPI looks.
 const SALES_WINDOW_DAYS = 7;

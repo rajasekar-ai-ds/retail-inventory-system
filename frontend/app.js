@@ -30,10 +30,12 @@ const formMsg = (form, role) => form.querySelector(`[data-role="${role}"]`);
 async function loadAll() {
   try {
     const since = Date.now() - SALES_WINDOW_DAYS * 86400000;
-    const [suppliers, products, txns] = await Promise.all([
+    const [suppliers, products, txns, alerts, summary] = await Promise.all([
       api("/suppliers"),
       api("/products"),
       api("/transactions?limit=1000"),
+      api("/dss/alerts"),
+      api("/dss/summary"),
     ]);
     state.suppliers = suppliers;
     state.products = products;
@@ -43,6 +45,7 @@ async function loadAll() {
     setConnection(true);
     showMsg($("global-error"), "");
     renderKpis(soldUnits);
+    renderDss(alerts, summary);
     renderChart();
     renderProducts();
     renderSuppliers();
@@ -90,6 +93,33 @@ function renderKpis(soldUnits) {
   $("kpi-out").textContent = fmtInt(out);
   $("kpi-sold-label").textContent = `Units sold (last ${SALES_WINDOW_DAYS} days)`;
   $("kpi-sold").textContent = fmtInt(soldUnits);
+}
+
+const statusBadge = (code) => {
+  const s = DSS_STATUS[code] ?? { label: code, cls: "nosales" }; // unknown code: show it raw, in grey
+  return `<span class="badge ${s.cls}">${esc(s.label)}</span>`;
+};
+
+// Alerts arrive already sorted by the backend (CRITICAL, REORDER, NO_SALES, OK); keep that order.
+function renderDss(alerts, summary) {
+  $("dss-summary").innerHTML = Object.keys(DSS_STATUS)
+    .map((code) => `<span class="chip">${statusBadge(code)} ${fmtInt(summary[code] ?? 0)}</span>`)
+    .join("");
+  $("dss-body").innerHTML = alerts.length
+    ? alerts
+        .map((a) => `<tr>
+          <td>${esc(a.name)}</td>
+          <td>${statusBadge(a.status)}</td>
+          <td class="num">${fmtInt(a.stock)}</td>
+          <td class="num">${a.lead_time_days}</td>
+          <td class="num">${a.avg_daily_demand.toFixed(1)}</td>
+          <td class="num">${a.days_of_cover === null ? "–" : a.days_of_cover.toFixed(1)}</td>
+          <td class="num">${a.reorder_point.toFixed(1)}</td>
+          <td class="num">${a.recommended_order_qty ? fmtInt(a.recommended_order_qty) : "–"}</td>
+          <td class="reason">${esc(a.reason)}</td>
+        </tr>`)
+        .join("")
+    : `<tr><td colspan="9" class="muted">No products yet.</td></tr>`;
 }
 
 function cssVar(name) {

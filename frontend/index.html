@@ -25,6 +25,22 @@
       <div class="kpi"><span class="kpi-label" id="kpi-sold-label">Units sold</span><span id="kpi-sold" class="kpi-value">–</span></div>
     </section>
 
+    <!-- Decision support: what to reorder -->
+    <section class="card">
+      <h2>Reorder alerts <span class="muted">(most urgent first)</span></h2>
+      <div id="dss-summary" class="chips"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Product</th><th>Status</th><th class="num">Stock</th><th class="num">Lead time (days)</th>
+            <th class="num">Avg sold / day</th><th class="num">Days of cover</th><th class="num">Reorder point</th>
+            <th class="num">Order qty</th><th>Why</th>
+          </tr></thead>
+          <tbody id="dss-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <div class="grid">
       <!-- Stock chart -->
       <section class="card">
