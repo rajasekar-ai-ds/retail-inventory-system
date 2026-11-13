@@ -1,6 +1,6 @@
 // ---------- State ----------
 
-const state = { suppliers: [], products: [] };
+const state = { suppliers: [], products: [], alerts: [] };
 let stockChart = null;
 
 const $ = (id) => document.getElementById(id);
@@ -39,6 +39,7 @@ async function loadAll() {
     ]);
     state.suppliers = suppliers;
     state.products = products;
+    state.alerts = alerts;
     const soldUnits = txns
       .filter((t) => t.txn_type === "sale" && Date.parse(t.txn_date) >= since)
       .reduce((sum, t) => sum - t.qty, 0); // sale qty is negative
@@ -128,11 +129,22 @@ function cssVar(name) {
 
 function renderChart() {
   if (typeof Chart === "undefined") {
+    $("chart-legend").hidden = true;
     $("chart-box").innerHTML = `<p class="muted">Chart unavailable (Chart.js CDN not reachable). See the Products table below.</p>`;
     return;
   }
   const rows = [...state.products].sort((a, b) => a.current_stock - b.current_stock);
   $("chart-box").style.height = Math.max(160, rows.length * 30 + 40) + "px";
+
+  const statusOf = new Map(state.alerts.map((a) => [a.product_id, DSS_STATUS[a.status]]));
+  const fillOf = (p) => cssVar(statusOf.get(p.product_id)?.fill ?? "--status-none");
+
+  // Legend lists only the statuses on screen, in DSS_STATUS order; text stays in text colours.
+  const shown = new Set(statusOf.values());
+  $("chart-legend").innerHTML = Object.values(DSS_STATUS)
+    .filter((s) => shown.has(s))
+    .map((s) => `<span class="legend-item"><span class="swatch" style="background:${cssVar(s.fill)}"></span>${esc(s.label)}</span>`)
+    .join("");
 
   const textColor = cssVar("--text-2");
   const gridColor = cssVar("--grid");
@@ -141,7 +153,7 @@ function renderChart() {
     datasets: [{
       label: "Units in stock",
       data: rows.map((p) => p.current_stock),
-      backgroundColor: cssVar("--series-1"),
+      backgroundColor: rows.map(fillOf),
       borderRadius: 4,
       borderSkipped: "start", // round only the data end, keep the baseline square
       maxBarThickness: 18,
@@ -154,7 +166,14 @@ function renderChart() {
     animation: false,
     plugins: {
       legend: { display: false }, // one series: the card title names it
-      tooltip: { callbacks: { label: (ctx) => ` ${fmtInt(ctx.parsed.x)} units` } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const status = statusOf.get(rows[ctx.dataIndex].product_id);
+            return ` ${fmtInt(ctx.parsed.x)} units` + (status ? ` · ${status.label}` : "");
+          },
+        },
+      },
     },
     scales: {
       x: { beginAtZero: true, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, border: { display: false } },

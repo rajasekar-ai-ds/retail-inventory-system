@@ -21,6 +21,11 @@
   --ok-bg: #e4f3e9;
   --nosales: #5f5e5a;
   --nosales-bg: #ecebe7;
+  /* Chart bar fills by DSS status: a fixed status scale, the same in light and dark. */
+  --status-critical: #d03b3b;
+  --status-warning: #fab219;
+  --status-good: #0ca30c;
+  --status-none: #8a8984;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -111,6 +116,9 @@ main { max-width: 1200px; margin: 0 auto; padding: 20px 24px 48px; display: flex
 .muted { color: var(--muted); font-weight: 400; }
 
 .chart-box { position: relative; height: 240px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: -4px 0 10px; font-size: 12px; color: var(--text-2); }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; }
 
 .form { display: flex; flex-direction: column; gap: 10px; }
 .form label, label.inline { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-2); }
