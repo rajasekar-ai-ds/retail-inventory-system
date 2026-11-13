@@ -14,6 +14,12 @@ DEMO_PRODUCTS = [
     ("Sunflower Oil 1L", 17500, 1, 120, (1, 6)),
     ("Basmati Rice 5kg", 59000, 1, 80, (0, 4)),
     ("Rose Biscuits", 3000, 1, 60, (0, 0)),  # never sells: exercises the NO_SALES path
+    # Steady 4/day: 125 - 29*4 leaves 9 units, ~2.6 days of cover vs a 5-day lead time -> CRITICAL.
+    # Keep it last: the shared rng would otherwise shift every product after it.
+    ("Colgate 200g", 11000, 1, 125, (4, 4)),
+    # Steady 4/day, 3-day lead: REORDER needs d*3 <= stock <= max_daily*3 (= reorder point), i.e. 10.3..12.
+    # 127 - 29*4 leaves 11 -> ~3.2 days of cover, at/below reorder point 12 -> REORDER.
+    ("Tata Salt 1kg", 2800, 0, 127, (4, 4)),
 ]
 
 
