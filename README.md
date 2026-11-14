@@ -31,6 +31,15 @@ Then open:
 `inventory.db` is created and seeded with demo data on first startup. Delete it to reset.
 The dashboard loads Chart.js from a CDN, so the chart needs internet access; everything else works offline.
 
+## Deploy on Render
+
+Create a **Web Service** from this repo (Python runtime, free tier):
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+The free tier's disk is ephemeral, so the database is recreated and re-seeded on every deploy or restart.
+
 ## Tech Stack
 
 - Python
