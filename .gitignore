@@ -3,4 +3,3 @@ __pycache__/
 .idea/
 inventory.db
 CLAUDE.md
-tests/
