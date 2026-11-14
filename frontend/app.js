@@ -29,7 +29,10 @@ const formMsg = (form, role) => form.querySelector(`[data-role="${role}"]`);
 
 async function loadAll() {
   try {
-    const since = Date.now() - SALES_WINDOW_DAYS * 86400000;
+    // Same window as dss.py: the last SALES_WINDOW_DAYS calendar days in UTC, today included.
+    const todayUtc = new Date();
+    todayUtc.setUTCHours(0, 0, 0, 0);
+    const since = todayUtc.getTime() - (SALES_WINDOW_DAYS - 1) * 86400000;
     const [suppliers, products, txns, alerts, summary] = await Promise.all([
       api("/suppliers"),
       api("/products"),

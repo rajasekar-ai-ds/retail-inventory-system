@@ -63,7 +63,7 @@ def _alert(product_id: int, name: str, stock: int, lead_time: int, daily: list[i
         days_of_cover = None
         state: DssStatus = "NO_SALES"
     else:
-        days_of_cover = stock / d
+        days_of_cover = stock / d  # exact; the status rules use this, the API and reason show cover_shown
         if days_of_cover < lead_time:
             state = "CRITICAL"
         elif stock <= reorder_point:
@@ -76,10 +76,13 @@ def _alert(product_id: int, name: str, stock: int, lead_time: int, daily: list[i
     else:
         order_qty = 0
 
+    # Rounded once: the days_of_cover field and the reason text must show the same number.
+    cover_shown = None if days_of_cover is None else round(float(days_of_cover), 1)
+
     if state == "NO_SALES":
         reason = f"No sales in the last {WINDOW_DAYS} days -> nothing to reorder."
     else:
-        cover = f"Stock {stock} lasts ~{float(days_of_cover):.1f} days"
+        cover = f"Stock {stock} lasts ~{cover_shown:.1f} days"
         if state == "CRITICAL":
             reason = f"{cover}; supplier needs {lead_time} days -> order now."
         elif state == "REORDER":
@@ -94,7 +97,7 @@ def _alert(product_id: int, name: str, stock: int, lead_time: int, daily: list[i
         lead_time_days=lead_time,
         avg_daily_demand=_round(d),
         max_daily_demand=max_daily,
-        days_of_cover=None if days_of_cover is None else _round(days_of_cover),
+        days_of_cover=cover_shown,
         safety_stock=_round(safety_stock),
         reorder_point=_round(reorder_point),
         status=state,

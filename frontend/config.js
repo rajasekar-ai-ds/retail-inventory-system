@@ -19,5 +19,5 @@ const DSS_STATUS = {
   OK: { label: "OK", cls: "ok", fill: "--status-good" },
 };
 
-// How far back the "units sold" KPI looks.
+// How far back the "units sold" KPI looks. Must equal WINDOW_DAYS in dss.py (same window as /dss demand).
 const SALES_WINDOW_DAYS = 7;
