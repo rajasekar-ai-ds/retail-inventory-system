@@ -1,9 +1,3 @@
----
-title: Retail Inventory DSS
-sdk: docker
-app_port: 7860
----
-
 # Retail Inventory System
 
 A simple retail inventory management API built with FastAPI.
